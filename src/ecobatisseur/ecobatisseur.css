@@ -1,0 +1,893 @@
+/* ==========================================================================
+   ÉCOBÂTISSEUR SOL — simulateur citoyen d'autonomie énergétique et hydrique.
+
+   Toute la palette dérive des variables de la base commune (--ab-*) : la
+   couleur d'identité du site (--ab-accent), le thème jour/nuit et la densité
+   BIG suivent automatiquement. Aucune teinte d'interface n'est codée en dur.
+
+   Accessibilité visée : WCAG AAA
+   · textes ≥ 7:1 sur leur fond (arbitrés sur l'encre sombre de la palette) ;
+   · cibles tactiles ≥ 44 px (curseurs, boutons, cartes de zone) ;
+   · visibilité du focus clavier partout, sémantique native (field, output,
+     details, article) et zones vivre pour la synthèse vocale.
+   ========================================================================== */
+
+.eb-page {
+  /* ---------- Jetons dérivés de la base (~100 % --ab-*) ------------------- */
+  --eb-texte: var(--ab-ink);
+  /* Texte « doux » : mix encre + gris de la base pour rester ≥ 7:1 (AAA),
+     là où --ab-muted seul (4,8:1) n'y suffit pas. */
+  --eb-doux: color-mix(in oklab, var(--ab-muted) 48%, var(--ab-ink));
+  --eb-fond: var(--ab-surface);
+  --eb-fond-doux: color-mix(in oklab, var(--ab-accent) 9%, var(--ab-surface));
+  --eb-bordure: var(--ab-border);
+  --eb-vif: var(--ab-accent);
+  /* Encre posée SUR la couleur vive : le vert sombre du site garantit ≥ 7:1. */
+  --eb-vif-encre: #fff;
+  /* Texte d'accent sur fond clair : mix qui traverse les deux thèmes (≥ 7:1). */
+  --eb-teinte: color-mix(in oklab, var(--ab-accent) 55%, var(--ab-ink));
+  --eb-ombre: 0 26px 64px -38px color-mix(in oklab, var(--ab-ink) 58%, transparent);
+  --eb-ombre-soft: 0 12px 32px -24px color-mix(in oklab, var(--ab-ink) 45%, transparent);
+
+  position: relative;
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: clamp(1.1rem, 3.5vw, 2.4rem) clamp(1rem, 4vw, 2rem) 4.5rem;
+  color: var(--eb-texte);
+  line-height: 1.6;
+}
+
+/* --- Thème nuit : la même teinte doit être plus légère pour rester AAA. --- */
+html[data-ab-theme='nuit'] .eb-page,
+.ab-shell[data-ab-theme='nuit'] .eb-page {
+  --eb-teinte: color-mix(in oklab, var(--ab-accent) 72%, var(--ab-ink));
+  --eb-fond-doux: color-mix(in oklab, var(--ab-accent) 14%, var(--ab-surface));
+  --eb-ombre-soft: 0 12px 32px -24px color-mix(in oklab, #000 65%, transparent);
+}
+
+.eb-page *,
+.eb-page *::before,
+.eb-page *::after {
+  box-sizing: border-box;
+}
+
+.eb-page ::selection {
+  background: color-mix(in oklab, var(--eb-vif) 26%, transparent);
+}
+
+/* Focus clavier : visible partout, jamais confisqué. */
+.eb-page :where(a, button, input, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--eb-vif);
+  outline-offset: 3px;
+  border-radius: 0.4rem;
+}
+
+/* Texte réservé à la synthèse vocale. */
+.eb-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Lien d'évitement : hors écran par défaut, devient une pastille au Tab. */
+.eb-sauter {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 60;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--eb-bordure);
+  border-radius: 999px;
+  background: var(--eb-fond);
+  color: var(--eb-texte);
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-decoration: none;
+  opacity: 0;
+  transform: translateY(-140%);
+  pointer-events: none;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.eb-sauter:focus-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Ancre de saut (après les barres) — invisible mais focalisable. */
+.eb-ancre {
+  display: block;
+  height: 0;
+  opacity: 0;
+  scroll-margin-top: 7rem;
+}
+
+/* ============================== En-tête ================================== */
+
+.eb-en-tete {
+  max-width: 72ch;
+}
+
+.eb-epigraphe {
+  margin: 0 0 0.55rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--eb-doux);
+}
+
+.eb-titre {
+  margin: 0 0 0.8rem;
+  font-size: clamp(1.85rem, 4.8vw, 3.1rem);
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+  font-weight: 820;
+}
+
+.eb-titre em {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--eb-teinte);
+}
+
+.eb-intro {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.6vw, 1.05rem);
+  color: var(--eb-doux);
+  max-width: 62ch;
+}
+
+.eb-sous-titre {
+  margin: 0 0 0.9rem;
+  font-size: clamp(1.2rem, 2.2vw, 1.55rem);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  font-weight: 810;
+}
+
+/* ============================ Grille générale ============================ */
+
+.eb-blocs {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+@media (min-width: 980px) {
+  .eb-blocs {
+    grid-template-columns: minmax(340px, 2fr) 3fr;
+    gap: 2.25rem;
+    align-items: start;
+  }
+
+  .eb-colonne--config {
+    position: sticky;
+    top: 1rem;
+  }
+}
+
+.eb-carte {
+  padding: 1.15rem;
+  border: 1px solid var(--eb-bordure);
+  border-radius: 1.15rem;
+  background: var(--eb-fond);
+  box-shadow: var(--eb-ombre-soft);
+}
+
+/* ============================ Champs de configuration ==================== */
+
+fieldset.eb-groupe {
+  min-inline-size: auto;
+  margin: 0;
+  padding: 0 0 0.4rem;
+  border: 0;
+}
+
+.eb-groupe + .eb-groupe {
+  margin-top: 0.4rem;
+  padding-top: 1rem;
+  border-top: 1px dashed color-mix(in oklab, var(--eb-doux) 30%, var(--ab-border));
+}
+
+.eb-legende {
+  margin-bottom: 0.7rem;
+  padding: 0;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--eb-texte);
+}
+
+.eb-legende__groupe {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: -0.45rem 0 0.8rem;
+  font-size: 0.8rem;
+  color: var(--eb-doux);
+}
+
+/* --------------------------- Info-bulle (i) ------------------------------ */
+
+.eb-bulle {
+  position: relative;
+  display: inline-flex;
+}
+
+.eb-bulle__bouton {
+  display: inline-grid;
+  place-items: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  padding: 0.35rem;
+  margin: -0.35rem;
+  border: 1px solid color-mix(in oklab, var(--eb-vif) 45%, var(--ab-border));
+  border-radius: 999px;
+  background: var(--eb-fond-doux);
+  color: var(--eb-teinte);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.74rem;
+  font-style: italic;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.eb-bulle__bouton:hover {
+  transform: scale(1.1);
+}
+
+.eb-bulle__bouton[aria-expanded='true'] {
+  background: var(--eb-vif);
+  color: var(--eb-vif-encre);
+}
+
+.eb-bulle__texte {
+  position: absolute;
+  top: calc(100% + 0.55rem);
+  left: -0.7rem;
+  z-index: 50;
+  width: min(19rem, 76vw);
+  padding: 0.8rem 0.95rem;
+  border: 1px solid var(--eb-bordure);
+  border-radius: 0.85rem;
+  background: var(--eb-fond);
+  color: var(--eb-texte);
+  font-size: 0.82rem;
+  font-style: normal;
+  line-height: 1.55;
+  box-shadow: var(--eb-ombre);
+}
+
+/* ------------------------ Slider de précision ---------------------------- */
+
+.eb-reglage {
+  display: block;
+  margin: 0 0 0.9rem;
+}
+
+.eb-reglage__tete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.2rem;
+}
+
+.eb-reglage__etiquette {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.eb-reglage__etiquette label {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--eb-texte);
+}
+
+.eb-reglage__valeur {
+  flex: none;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid color-mix(in oklab, var(--eb-vif) 32%, var(--ab-border));
+  border-radius: 0.62rem;
+  background: var(--eb-fond-doux);
+  color: var(--eb-teinte);
+  font-weight: 800;
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+  transition: transform 0.3s ease;
+}
+
+/* Feedback visuel pendant la manipulation : la valeur « s'éveille ». */
+.eb-reglage:has(.eb-slider:active) .eb-reglage__valeur {
+  transform: scale(1.07);
+}
+
+.eb-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 44px; /* cible tactile ≥ 44 px */
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.eb-slider::-webkit-slider-runnable-track {
+  height: 12px;
+  border: 1px solid var(--eb-bordure);
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--eb-vif) var(--eb-pct, 50%),
+    var(--ab-chip) var(--eb-pct, 50%)
+  );
+}
+
+.eb-slider::-webkit-slider-thumb {
+  width: 30px;
+  height: 30px;
+  margin-top: -10px;
+  border: 3px solid var(--eb-fond);
+  border-radius: 999px;
+  background: var(--eb-vif);
+  box-shadow: 0 2px 6px color-mix(in oklab, var(--ab-ink) 40%, transparent);
+  -webkit-appearance: none;
+  appearance: none;
+  transition: box-shadow 0.3s ease;
+}
+
+.eb-slider:active::-webkit-slider-thumb {
+  box-shadow: 0 0 0 9px color-mix(in oklab, var(--eb-vif) 24%, transparent);
+}
+
+.eb-slider::-moz-range-track {
+  height: 12px;
+  border: 1px solid var(--eb-bordure);
+  border-radius: 999px;
+  background: var(--ab-chip);
+}
+
+.eb-slider::-moz-range-progress {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--eb-vif);
+}
+
+.eb-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--eb-fond);
+  border-radius: 999px;
+  background: var(--eb-vif);
+  box-shadow: 0 2px 6px color-mix(in oklab, var(--ab-ink) 40%, transparent);
+  transition: box-shadow 0.3s ease;
+}
+
+.eb-slider:active::-moz-range-thumb {
+  box-shadow: 0 0 0 9px color-mix(in oklab, var(--eb-vif) 24%, transparent);
+}
+
+/* ------------------- Sélecteur visuel de zones --------------------------- */
+
+.eb-zones {
+  display: grid;
+  gap: 0.55rem;
+}
+
+@media (min-width: 620px) {
+  .eb-zones {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
+.eb-zone {
+  position: relative;
+  display: block;
+}
+
+/* Radio entier mais invisible : TOUTE la carte est la cible tactile. */
+.eb-zone__radio {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.eb-zone__carte {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  min-height: 3.4rem;
+  padding: 0.7rem 0.8rem;
+  border: 1.5px solid var(--eb-bordure);
+  border-radius: 0.9rem;
+  background: var(--eb-fond);
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.eb-zone__carte:hover {
+  transform: translateY(-2px);
+}
+
+.eb-zone input:checked + .eb-zone__carte {
+  border-color: var(--eb-vif);
+  background: var(--eb-fond-doux);
+  box-shadow: var(--eb-ombre-soft);
+}
+
+.eb-zone input:checked + .eb-zone__carte .eb-zone__nom {
+  color: var(--eb-teinte);
+}
+
+.eb-zone input:focus-visible + .eb-zone__carte {
+  outline: 3px solid var(--eb-vif);
+  outline-offset: 3px;
+}
+
+.eb-zone__soleil {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--eb-teinte);
+}
+
+.eb-zone__nom {
+  font-size: 0.92rem;
+  font-weight: 750;
+  color: var(--eb-texte);
+  transition: color 0.3s ease;
+}
+
+.eb-zone__villes {
+  font-size: 0.76rem;
+  color: var(--eb-doux);
+}
+
+.eb-astuce {
+  margin: 0.8rem 0 0;
+  font-size: 0.78rem;
+  color: var(--eb-doux);
+}
+
+/* ============================= Résultats ================================= */
+
+.eb-resultats {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+}
+
+.eb-resultat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.05rem 1.15rem;
+  border: 1px solid var(--eb-bordure);
+  border-radius: 1.15rem;
+  background: var(--eb-fond);
+  box-shadow: var(--eb-ombre-soft);
+  transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.eb-resultat:hover {
+  border-color: color-mix(in oklab, var(--eb-vif) 45%, var(--ab-border));
+  transform: translateY(-2px);
+}
+
+.eb-resultat__icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  margin-bottom: 0.2rem;
+  border-radius: 0.75rem;
+  background: var(--eb-fond-doux);
+  font-size: 1.1rem;
+}
+
+.eb-resultat__titre {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--eb-doux);
+}
+
+.eb-resultat__valeur {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.eb-resultat__nombre {
+  font-size: clamp(1.75rem, 4.5vw, 2.4rem);
+  font-weight: 820;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--eb-texte);
+  font-variant-numeric: tabular-nums;
+}
+
+.eb-resultat__nombre--argent {
+  color: var(--eb-teinte);
+}
+
+.eb-resultat__unite {
+  font-size: 0.86rem;
+  font-weight: 750;
+  color: var(--eb-doux);
+}
+
+.eb-resultat__note {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--eb-doux);
+}
+
+.eb-resultat__note strong {
+  color: var(--eb-texte);
+  font-weight: 800;
+}
+
+.eb-resultat__conseil {
+  margin: 0.55rem 0 0;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid color-mix(in oklab, var(--eb-vif) 42%, var(--ab-border));
+  border-radius: 0.75rem;
+  background: var(--eb-fond-doux);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--eb-texte);
+}
+
+/* Zone vive de résumé : uniquement la synthèse vocale. */
+.eb-summary {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* ================ Matrice de recommandations budgétaires ================= */
+
+.eb-plan {
+  margin-top: 3rem;
+}
+
+.eb-plan__intro {
+  margin: 0.2rem 0 0;
+  max-width: 64ch;
+  font-size: 0.92rem;
+  color: var(--eb-doux);
+}
+
+.eb-paliers {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.35rem;
+}
+
+@media (min-width: 980px) {
+  .eb-paliers {
+    grid-template-columns: repeat(3, 1fr);
+    align-items: start;
+  }
+}
+
+.eb-palier {
+  overflow: clip;
+  border: 1px solid var(--eb-bordure);
+  border-radius: 1.15rem;
+  background: var(--eb-fond);
+  box-shadow: var(--eb-ombre-soft);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.eb-palier--ouvert {
+  border-color: color-mix(in oklab, var(--eb-vif) 55%, var(--ab-border));
+  box-shadow: var(--eb-ombre);
+}
+
+.eb-palier__h {
+  margin: 0;
+}
+
+.eb-palier__bouton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 3rem; /* cible tactile ≥ 44 px */
+  padding: 0.85rem 1.05rem;
+  border: 0;
+  background: var(--eb-fond-doux);
+  color: var(--eb-texte);
+  font: inherit;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.eb-palier__bouton:hover {
+  background: color-mix(in oklab, var(--eb-vif) 15%, var(--ab-surface));
+}
+
+.eb-palier__entete {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.eb-palier__titre {
+  font-size: 0.95rem;
+  font-weight: 810;
+  letter-spacing: -0.01em;
+}
+
+.eb-palier__cout {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--eb-teinte);
+}
+
+.eb-palier__chevron {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  color: var(--eb-teinte);
+  transition: transform 0.3s ease;
+}
+
+.eb-palier--ouvert .eb-palier__chevron {
+  transform: rotate(180deg);
+}
+
+/* Accordion animé : la rangée de grille passe de 0fr à 1fr en 300 ms ; la
+   visibilité retombe à la fin de la fermeture (support natif de visibilité
+   animée) et masque le contenu des lecteurs d'écran quand le palier est clos. */
+.eb-palier__enveloppe {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition: grid-template-rows 0.3s ease, visibility 0.3s ease;
+}
+
+.eb-palier--ouvert .eb-palier__enveloppe {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+
+.eb-palier__interieur {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.eb-palier__accroche {
+  margin: 0;
+  padding: 0.9rem 1rem 0.2rem;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--eb-doux);
+}
+
+.eb-fiches {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0.7rem 1rem 1.1rem;
+  list-style: none;
+}
+
+.eb-fiche article {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.8rem 0.85rem;
+  border: 1px solid var(--eb-bordure);
+  border-radius: 0.95rem;
+  background: var(--eb-fond);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.eb-fiche article:hover {
+  border-color: color-mix(in oklab, var(--eb-vif) 40%, var(--ab-border));
+  transform: translateY(-2px);
+}
+
+.eb-fiche__icone {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 0.65rem;
+  background: var(--eb-fond-doux);
+  font-size: 1.05rem;
+}
+
+.eb-fiche__corps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.eb-fiche__titre {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--eb-texte);
+}
+
+.eb-fiche__texte {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--eb-doux);
+}
+
+.eb-fiche__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.2rem 0 0;
+  font-size: 0.76rem;
+}
+
+.eb-fiche__cout {
+  padding: 0.22rem 0.55rem;
+  border: 1px solid var(--eb-bordure);
+  border-radius: 999px;
+  font-weight: 750;
+  color: var(--eb-doux);
+}
+
+.eb-fiche__gain {
+  padding: 0.22rem 0.62rem;
+  border: 1px solid color-mix(in oklab, var(--eb-vif) 38%, var(--ab-border));
+  border-radius: 999px;
+  background: var(--eb-fond-doux);
+  color: var(--eb-teinte);
+  font-weight: 800;
+}
+
+/* ============================ Méthodologie =============================== */
+
+.eb-methodo {
+  margin-top: 1.6rem;
+  border: 1px solid var(--eb-bordure);
+  border-radius: 1.05rem;
+  background: var(--eb-fond);
+}
+
+.eb-methodo summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 3rem;
+  padding: 0.8rem 1.05rem;
+  border-radius: 1.05rem;
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: var(--eb-texte);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.eb-methodo summary:hover {
+  background: var(--eb-fond-doux);
+}
+
+.eb-methodo summary::after {
+  content: '▾';
+  color: var(--eb-teinte);
+  transition: transform 0.3s ease;
+}
+
+.eb-methodo[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.eb-methodo summary::-webkit-details-marker,
+.eb-methodo summary::marker {
+  display: none;
+  list-style: none;
+}
+
+.eb-methodo__contenu {
+  padding: 0 1.05rem 1rem;
+}
+
+.eb-methodo__contenu ul {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--eb-doux);
+}
+
+/* ============================ Micro-animations ============================ */
+
+@keyframes eb-apparition {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.eb-resultat,
+.eb-palier {
+  animation: eb-apparition 0.45s ease backwards;
+}
+
+.eb-resultat:nth-child(2) {
+  animation-delay: 0.06s;
+}
+
+.eb-resultat:nth-child(3) {
+  animation-delay: 0.12s;
+}
+
+.eb-resultat:nth-child(4) {
+  animation-delay: 0.18s;
+}
+
+/* Respect du réglage système : aucune animation, tout instantané. */
+@media (prefers-reduced-motion: reduce) {
+  .eb-page *,
+  .eb-page *::before,
+  .eb-page *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ======================= Ajustements petits écrans ======================= */
+
+@media (max-width: 420px) {
+  .eb-page {
+    padding-top: 1rem;
+  }
+
+  .eb-reglage__tete {
+    align-items: flex-start;
+  }
+
+  .eb-bulle__texte {
+    width: min(16rem, 84vw);
+  }
+}

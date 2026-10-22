@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aperçu mobile — ÉcoBâtisseur Sol</title>
+    <style>
+      /* Voile de revue : cadre l'application à la largeur d'un téléphone. */
+      body {
+        margin: 0;
+        padding: 1.5rem;
+        display: flex;
+        gap: 1.5rem;
+        align-items: flex-start;
+        justify-content: center;
+        flex-wrap: wrap;
+        background: #101418;
+        font-family: system-ui, sans-serif;
+      }
+      figure {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+      }
+      figcaption {
+        color: #b8c4cc;
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .ecran {
+        border: 10px solid #000;
+        border-radius: 28px;
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+        overflow: hidden;
+        background: #fff;
+      }
+      iframe {
+        display: block;
+        border: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <figure>
+      <div class="ecran">
+        <iframe src="/" width="390" height="3700" title="ÉcoBâtisseur Sol en 390 px de large"></iframe>
+      </div>
+      <figcaption>Smartphone · 390 × 844 (page longue) · jour</figcaption>
+    </figure>
+    <figure>
+      <div class="ecran">
+        <iframe
+          src="/"
+          width="390"
+          height="3700"
+          title="ÉcoBâtisseur Sol, thème nuit"
+          id="cible-nuit"
+        ></iframe>
+      </div>
+      <figcaption>Smartphone · 390 × 844 · thème nuit</figcaption>
+    </figure>
+    <script>
+      /* Téléphone nuit : on force l'attribut de thème sur le document de
+         l'iframe (même origine) et on le repose si la base le réécrit, grâce à
+         un observateur. Le téléphone « jour » n'est pas touché. */
+      const nuit = document.getElementById('cible-nuit');
+      nuit.addEventListener('load', () => {
+        const docteur = nuit.contentDocument;
+        const force = () => {
+          if (docteur.documentElement.getAttribute('data-ab-theme') !== 'nuit') {
+            docteur.documentElement.setAttribute('data-ab-theme', 'nuit');
+          }
+        };
+        new MutationObserver(force).observe(docteur.documentElement, {
+          attributes: true,
+          attributeFilter: ['data-ab-theme'],
+        });
+        force();
+      });
+    </script>
+  </body>
+</html>

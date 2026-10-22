@@ -20,11 +20,33 @@ bun run dev
 
 ```
 src/
-  main.tsx            point d'entrée
-  App.tsx             application enveloppée par <AppShell>
-  alphabette.app.ts   identité du site (nom, sous-titre, couleur, liens)
-  shell/              base commune @alphabette/shell (générée, à ne pas recoder)
+  main.tsx                      point d'entrée
+  App.tsx                       application enveloppée par <AppShell>
+  alphabette.app.ts             identité du site (nom, sous-titre, couleur, liens)
+  shell/                        base commune @alphabette/shell (générée, à ne pas recoder)
+  ecobatisseur/
+    EcoBatisseur.tsx            le simulateur : configuration, résultats, plan d'action
+    calcul.ts                   moteur de calcul (zones climatiques, formules commentées)
+    recommandations.ts          matrice des trois paliers budgétaires (fiches + gains)
+    ui.tsx                      petites briques : compteur animé, info-bulles, sliders
+    ecobatisseur.css            style (palette dérivée de --ab-*, mobile-first, AAA)
 ```
+
+## Le simulateur
+
+Trois paramètres (surface de toiture, zone climatique visuelle, facture
+mensuelle) → quatre résultats en direct aux nombres animés (production kWh/an,
+eau de pluie L/an, économies €/an, amortissement) → un plan d'action en trois
+paliers (0 € · < 500 € · > 2 000 €) dont les gains s'adaptent au profil calculé.
+
+- **Accessibilité** : WCAG AAA visé — contrastes ≥ 7:1 sur les textes, cibles
+  tactiles ≥ 44 px, navigation clavier intégrale, info-bulles au clavier (Échap
+  pour fermer, texte lu par aria-describedby), zone vive aria-live pour le
+  résumé des calculs, respect de prefers-reduced-motion.
+- **Aperçu de revue** : `public/apercu-mobile.html` (téléphone 390 px, jour +
+  nuit) ; captures `apercu-bureau.png` et `apercu-mobile.png` à la racine.
+- **Hypothèses** : voir le bloc « Méthode de calcul » dans l'interface. Le
+  simulateur est une boussole citoyenne, pas un devis.
 
 ## La base commune
 

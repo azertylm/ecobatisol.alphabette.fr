@@ -1,25 +1,22 @@
 import { AppShell } from '@alphabette/shell';
 import '@alphabette/shell/style.css';
+import './ecobatisseur/ecobatisseur.css';
 import { APP } from './alphabette.app';
+import { EcoBatisseur } from './ecobatisseur/EcoBatisseur';
 
 /**
- * ÉcoBâtisseur Sol — Autonomie solaire et eau de pluie, chiffrée chez vous
+ * ÉcoBâtisseur Sol — autonomie solaire et eau de pluie, chiffrée chez vous.
  *
- * La base commune (deux barres, thème jour/nuit, densité, plein écran) est
- * fournie par <AppShell>. Le contenu de l'application se construit à
- * l'intérieur.
+ * La base commune (deux barres, thème jour/nuit, densité, plein écran, panneaux
+ * dons/compte/clés) est fournie par <AppShell>. Le simulateur vit dedans et
+ * hérite d'elle : ses couleurs dérivent de --ab-accent, son thème de la base.
  */
 export function App() {
   return (
     <AppShell app={APP}>
-      <div style={{ maxWidth: 880, margin: '0 auto' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 0.5rem' }}>
-          ÉcoBâtisseur Sol
-        </h1>
-        <p style={{ color: '#64748b', lineHeight: 1.6 }}>
-          Bienvenue. Le contenu de l’application se construit ici.
-        </p>
-      </div>
+      <main id="eb-contenu">
+        <EcoBatisseur />
+      </main>
     </AppShell>
   );
 }
