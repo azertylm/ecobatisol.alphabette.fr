@@ -185,6 +185,50 @@ html[data-ab-theme='nuit'] .eb-page,
   box-shadow: var(--eb-ombre-soft);
 }
 
+/* ---------------------- Exemples préremplis ------------------------------ */
+
+.eb-exemples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  padding-bottom: 1.05rem;
+  margin-bottom: 1.05rem;
+  border-bottom: 1px dashed color-mix(in oklab, var(--eb-doux) 30%, var(--ab-border));
+}
+
+.eb-exemples__titre {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--eb-doux);
+}
+
+.eb-exemple {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem; /* cible tactile ≥ 44 px */
+  padding: 0.4rem 0.85rem;
+  border: 1px solid color-mix(in oklab, var(--eb-vif) 40%, var(--ab-border));
+  border-radius: 999px;
+  background: var(--eb-fond);
+  color: var(--eb-texte);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+.eb-exemple:hover {
+  background: var(--eb-fond-doux);
+  border-color: var(--eb-vif);
+  transform: translateY(-2px);
+}
+
+.eb-exemple:active {
+  transform: translateY(0);
+}
+
 /* ============================ Champs de configuration ==================== */
 
 fieldset.eb-groupe {

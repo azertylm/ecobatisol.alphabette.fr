@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Aperçu scénario copropriété — ÉcoBâtisseur Sol</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 1.5rem;
+        background: #101418;
+        font-family: system-ui, sans-serif;
+      }
+      p {
+        margin: 0 0 0.8rem;
+        color: #b8c4cc;
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      iframe {
+        display: block;
+        border: 0;
+        border-radius: 14px;
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+        background: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <p>Scénario copropriété · 1 400 m² de toit · 2 200 €/mois · Méditerranée</p>
+    <iframe
+      id="cible"
+      src="/"
+      width="1240"
+      height="3060"
+      title="ÉcoBâtisseur Sol — scénario immeuble en copropriété"
+    ></iframe>
+    <script>
+      /* Scénario de revue : on clique l'exemple « Copropriété », la zone
+         Méditerranée, puis on ouvre le palier « Investissement » (fiches
+         adaptées aux immeubles) — avec réessais, car le montage React peut se
+         terminer après le chargement de l'iframe. */
+      const cible = document.getElementById('cible');
+      let essais = 0;
+      let palierOuvert = false;
+      const scroller = () => {
+        const doc = cible.contentDocument;
+        if (!doc || essais > 40) return;
+        essais += 1;
+        const preset = doc.getElementById('eb-preset-copro');
+        if (preset && preset.click) preset.click();
+        const zone = doc.querySelector('input[type="radio"][value="mediterranee"]');
+        if (zone && zone.click) zone.click();
+        const bouton = doc.getElementById('eb-palier-investissement-bouton');
+        if (bouton && bouton.getAttribute('aria-expanded') === 'true') {
+          palierOuvert = true;
+        } else if (bouton && bouton.click) {
+          bouton.click();
+        }
+        const range = doc.getElementById('eb-surface');
+        if (!palierOuvert || !range || range.value !== '1400') {
+          window.setTimeout(scroller, 400);
+        }
+      };
+      cible.addEventListener(
+        'load',
+        () => {
+          window.setTimeout(scroller, 500);
+        },
+        { once: true },
+      );
+    </script>
+  </body>
+</html>

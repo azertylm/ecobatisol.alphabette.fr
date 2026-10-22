@@ -34,10 +34,13 @@ src/
 
 ## Le simulateur
 
-Trois paramètres (surface de toiture, zone climatique visuelle, facture
-mensuelle) → quatre résultats en direct aux nombres animés (production kWh/an,
-eau de pluie L/an, économies €/an, amortissement) → un plan d'action en trois
-paliers (0 € · < 500 € · > 2 000 €) dont les gains s'adaptent au profil calculé.
+Trois paramètres (surface de toiture — de 10 à 5 000 m², de la maison à la
+copropriété —, zone climatique visuelle, facture mensuelle — jusqu'à 6 000 €/mois)
+→ quatre résultats en direct aux nombres animés (production kWh/an, eau de pluie
+L/an, économies €/an, amortissement) → un plan d'action en trois paliers
+(0 € · < 500 € · > 2 000 €) dont les gains s'adaptent au profil calculé, avec
+économie d'échelle sur les coûts de fabrication et de pose (PV dégressif par
+paliers, cuve dimensionnée au volume, plafond d'eau adapté au nombre de foyers).
 
 - **Accessibilité** : WCAG AAA visé — contrastes ≥ 7:1 sur les textes, cibles
   tactiles ≥ 44 px, navigation clavier intégrale, info-bulles au clavier (Échap

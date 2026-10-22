@@ -13,7 +13,7 @@
  */
 
 import { useCallback, useMemo, useState } from 'react';
-import { calculer, ZONES, type ContexteGains } from './calcul';
+import { calculer, coutMoyenParKwc, ZONES, type ContexteGains } from './calcul';
 import { MATRICE } from './recommandations';
 import {
   Compteur,
@@ -108,9 +108,10 @@ export function EcoBatisseur() {
           Votre maison peut produire <em>ce qu’elle consomme</em>.
         </h1>
         <p className="eb-intro">
-          Renseignez trois paramètres : votre toiture, votre région, votre facture. Le simulateur
-          chiffre en direct joule et goutte ce que l’autonomie vous rapporterait, puis construit un
-          plan d’action en trois paliers budgétaires.
+          Renseignez trois paramètres : votre toiture, votre région, votre facture — de la maison
+          individuelle à l’immeuble en copropriété (jusqu’à 5 000 m² de toit et 6 000 € par mois).
+          Le simulateur chiffre en direct joule et goutte ce que l’autonomie vous rapporterait, puis
+          construit un plan d’action en trois paliers budgétaires.
         </p>
       </header>
 
@@ -124,6 +125,46 @@ export function EcoBatisseur() {
           </h2>
 
           <form className="eb-carte" noValidate>
+            <div className="eb-exemples" role="group" aria-label="Exemples préremplis">
+              <span className="eb-exemples__titre">Exemples :</span>
+              <button
+                type="button"
+                className="eb-exemple"
+                id="eb-preset-maison"
+                onClick={() => {
+                  setSurfaceToiture(80);
+                  setFactureMensuelle(120);
+                  vibrer(8);
+                }}
+              >
+                🏠 Maison
+              </button>
+              <button
+                type="button"
+                className="eb-exemple"
+                id="eb-preset-copro"
+                onClick={() => {
+                  setSurfaceToiture(1400);
+                  setFactureMensuelle(2200);
+                  vibrer(8);
+                }}
+              >
+                🏢 Copropriété
+              </button>
+              <button
+                type="button"
+                className="eb-exemple"
+                id="eb-preset-tertiaire"
+                onClick={() => {
+                  setSurfaceToiture(4000);
+                  setFactureMensuelle(4800);
+                  vibrer(8);
+                }}
+              >
+                🏭 Tertiaire
+              </button>
+            </div>
+
             <fieldset className="eb-groupe">
               <legend className="eb-legende">Votre toiture et votre facture</legend>
 
@@ -131,8 +172,8 @@ export function EcoBatisseur() {
                 id="eb-surface"
                 legende="Surface de toiture"
                 min={10}
-                max={300}
-                pas={5}
+                max={5000}
+                pas={10}
                 valeur={surfaceToiture}
                 auChangement={(v) => {
                   setSurfaceToiture(v);
@@ -140,14 +181,14 @@ export function EcoBatisseur() {
                 }}
                 format={(v) => `${nombre(v)} m²`}
                 idBulle="eb-bulle-surface"
-                bulle="La zone de toit dégagée, sans ombre, sans cheminée ni lucarne. Repérez-la à la fenêtre ou sur un plan : comptez la longueur × la largeur du pans sud si possible. 80 m² correspondent par exemple à une maison de taille moyenne."
+                bulle="La zone de toit dégagée, sans ombre ni obstacle — maison, immeuble en copropriété ou bâtiment collectif. Comptez la longueur × la largeur des pans exploitables : 80 m² pour une maison de taille moyenne, de 500 à 3 000 m² pour les toitures d'un immeuble ou d'une halle."
               />
               <SliderPrecision
                 id="eb-facture"
                 legende="Facture d’électricité mensuelle"
                 min={20}
-                max={400}
-                pas={5}
+                max={6000}
+                pas={10}
                 valeur={factureMensuelle}
                 auChangement={(v) => {
                   setFactureMensuelle(v);
@@ -155,7 +196,7 @@ export function EcoBatisseur() {
                 }}
                 format={(v) => `${nombre(v)} € / mois`}
                 idBulle="eb-bulle-facture"
-                bulle="Reprenez une facture récente (montant TTC). Cette valeur estime votre consommation : à 25 c€ le kWh, 120 € par mois correspondent à environ 5 700 kWh par an — c’est la cible que votre production solaire cherchera à couvrir."
+                bulle="La facture TTC mensuelle d’électricité, du logement à la copropriété (parties communes, éclairage, ascenseur, pompes à chaleur…). Repères : 120 €/mois ≈ 5 700 kWh/an pour une maison ; 1 500 €/mois ≈ 71 500 kWh/an pour un immeuble ; le simulateur en déduit la consommation à couvrir."
               />
             </fieldset>
 
@@ -264,8 +305,8 @@ export function EcoBatisseur() {
                 </span>
               </output>
               <p className="eb-resultat__note">
-                Dont ≈ {nombre(Math.round(calcul.eauRemplaceeM3 * 1000))} L d’eau potable
-                remplacée (WC, linge, jardin)
+                Dont ≈ {nombre(Math.round(calcul.eauRemplaceeM3 * 1000))} L d’eau potable remplacée
+                (WC, linge, jardin — parties communes incluses pour un bâtiment)
               </p>
             </article>
 
@@ -325,7 +366,9 @@ export function EcoBatisseur() {
                 Investissement estimé :{' '}
                 <strong>{nombreFmt(calcul.investissementEur)} €</strong> (
                 {nombreFmt(calcul.coutSolaireEur)} € solaire + {nombreFmt(calcul.coutEauEur)} € cuve),
-                hors aides publiques
+                hors aides publiques · coût moyen :{' '}
+                <strong>{nombreFmt(coutMoyenParKwc(calcul.puissanceKwc))} €/kWc</strong> — dégressif
+                avec la taille (actions de fabrication et de pose mutualisées sur grandes toitures)
               </p>
             </article>
           </div>
@@ -419,20 +462,24 @@ export function EcoBatisseur() {
               <li>
                 Solaire : 70 % de la toiture exploitable, 6,5 m² par kWc, rendement selon la zone
                 (900 à 1 400 kWh/kWc/an), 45 % autoconsommé à prix plein (25 c€/kWh), surplus revendu
-                ≈ 4 c€/kWh.
+                ≈ 4 c€/kWh. Tarif résidentiel appliqué ; en tertiaire le prix réel diffère un peu.
               </li>
               <li>
                 Eau : pluviométrie de la zone × 90 % de la surface de toit collectée, 75 % utilisable
-                (WC, lave-linge, jardin), valorisée au tarif de l’eau potable (4,30 €/m³), plafonnée
-                à 45 m³/an par foyer.
+                (WC, lave-linge, jardin, parties communes), valorisée au tarif de l’eau potable
+                (4,30 €/m³). Plafond : 45 m³/an par maison, et un foyer à 45 m³/an tous les ~120 m²
+                de toiture dans un immeuble.
               </li>
               <li>
-                Coûts : pose photovoltaïque ≈ 2 600 € + 1 733 €/kWc ; cuve enterrée 5 m³ raccordée ≈
-                4 500 €. Amortissement calculé sans primes ni aides publiques, pour rester prudent.
+                Coûts dégressifs (économies d’échelle de la fabrication et de la pose) : PV ≈ 1 733
+                €/kWc jusqu’à 9 kWc, ≈ 1 250 €/kWc sur copropriétés et grands hangars, ≈ 900 €/kWc
+                au-delà de 100 kWc ; cuve enterrée à partir de 4 500 € (cuve 5 m³) puis 900 €/m³ de
+                stockage en plus. Amortissement sans primes ni aides publiques, pour rester prudent.
               </li>
               <li>
-                Chaque valeur est un ordre de grandeur destiné à orienter la décision — ne remplace
-                pas l’étude d’un installateur qualifié ni le compte d’une facture locale.
+                Chaque valeur est un ordre de grandeur destiné à orienter la décision — une
+                copropriété reste un vote du syndicat, une étude d’installateur qualifié et des
+                devis comparés, jamais ce chiffre seul.
               </li>
             </ul>
           </div>

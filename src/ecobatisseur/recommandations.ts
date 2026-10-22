@@ -111,8 +111,9 @@ export const MATRICE: PalierBudget[] = [
         titre: 'Cuve hors-sol 300 L + gouttière',
         cout: '≈ 150 €',
         texte:
-          'Branchée directement sur la descente de gouttière, une cuve de 300 litres couvre la saison d’arrosage d’un potager et lave la terrasse sans toucher au réseau.',
-        gain: (ctx) => `≈ ${eu(Math.round((ctx.volumeEauLitres * 0.15) / 1000))} m³/an`,
+          'Branchée directement sur la descente de gouttière, une cuve de 300 litres couvre la saison d’arrosage d’un potager et lave la terrasse sans toucher au réseau. Sur un immeuble, pensez plutôt à la grande cuve enterrée du palier 3.',
+        gain: (ctx) =>
+          `≈ ${eu(Math.min(12, Math.round((ctx.volumeEauLitres * 0.15) / 1000)))} m³/an`,
       },
       {
         icone: '🧣',
@@ -137,29 +138,42 @@ export const MATRICE: PalierBudget[] = [
     titre: 'Investissement & Autonomie',
     cout: 'Plus de 2 000 €',
     accroche:
-      'Le grand pas vers l’autonomie : des équipements qui produisent. Chiffres adaptés à votre configuration ci-dessus.',
+      'Le grand pas vers l’autonomie : des équipements qui produisent. Des chiffres adaptés à votre configuration ci-dessus, de la maison à la copropriété.',
     fiches: [
       {
         icone: '☀️',
         titre: 'Installation photovoltaïque en autoconsommation',
         cout: 'Devis local',
         texte:
-          'Panneaux sur votre toiture, courant consommé en direct, surplus revendu. Les primes à l’autoconsommation et la TVA réduite diminuent la facture réelle : l’amortissement ci-dessus est calculé sans aides, pour rester prudent.',
+          'Panneaux sur votre toiture, courant consommé en direct, surplus revendu. Les primes à l’autoconsommation et la TVA réduite diminuent la facture réelle : l’amortissement ci-dessus est calculé sans aides, pour rester prudent. Sur grandes toitures, la fabrication et la pose sont mutualisées, ce qui réduit sensiblement le coût au kWc.',
         gain: (ctx) =>
           ctx.economieSolaireEur > 0
             ? `≈ ${eu(ctx.economieSolaireEur)} €/an — ${eu(ctx.productionKwh)} kWh/an`
             : 'Non pertinent avec cette configuration',
       },
       {
-        icone: '🚰',
-        titre: 'Cuve enterrée 5 m³, WC et lave-linge raccordés',
-        cout: '≈ 4 500 €',
+        icone: '🏢',
+        titre: 'Copropriété : centrale sur toitures communes',
+        cout: 'Devis + vote en AG',
         texte:
-          'La cuve enterrée stocke l’hiver pour l’été ; une pompe alimente la chasse et la machine à laver. C’est 40 % d’eau potable remplacée toute l’année, invisiblement.',
+          'L’assemblée des copropriétaires vote, la copro reste propriétaire. La production alimente d’abord les parties communes (éclairage, ascenseur, VMC, pompes), le surplus est revendu et crédite le compte d’exploitation : chaque copropriétaire profite des économies via ses charges. Un dossier clé : le Syndicat des copropriétaires mandate la régie, l’installateur garantit l’étanchéité.',
         gain: (ctx) =>
-          `≈ ${eu(Math.round(ctx.eauRemplaceeM3 * 4.3))} €/an — ${eu(
-            Math.round(ctx.eauRemplaceeM3 * 1000),
-          )} L/an`,
+          ctx.economieSolaireEur > 0
+            ? `≈ ${eu(ctx.economieSolaireEur)} €/an sur les charges`
+            : 'Non pertinent avec cette configuration',
+      },
+      {
+        icone: '🚰',
+        titre: 'Cuve d’eau de pluie enterrée, WC et lave-linge raccordés',
+        cout: 'Volume adapté',
+        texte:
+          'La cuve enterrée stocke l’hiver pour l’été ; une pompe alimente la chasse et la machine à laver. Maison : cuve 5 à 8 m³. Copropriété : le volume se cale sur les foyers du bâtiment et les usages des parties communes — c’est jusqu’à 40 % d’eau potable remplacée toute l’année, invisiblement.',
+        gain: (ctx) =>
+          `≈ ${eu(Math.round(ctx.eauRemplaceeM3 * 4.3))} €/an — ${
+            ctx.eauRemplaceeM3 >= 100
+              ? `${eu(Math.round(ctx.eauRemplaceeM3))} m³/an remplacés`
+              : `${eu(Math.round(ctx.eauRemplaceeM3 * 1000))} L/an remplacés`
+          }`,
       },
       {
         icone: '♨️',

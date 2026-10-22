@@ -9,6 +9,11 @@
  * Le simulateur donne un PLAN D'ACTION, pas un devis : chaque valeur affichée
  * est un ordre de grandeur discutable par un installateur réel.
  *
+ * Ça va de la maison individuelle à l'immeuble en copropriété et au tertiaire :
+ * les coûts de pose/fabrication sont DÉGRESSIFS par palier (plus on est gros,
+ * moins la fabrication et la pose coûtent au kWc et au m³), et le plafond d'eau
+ * remplaçable suit le nombre de foyers du bâtiment.
+ *
  * Toutes les grandeurs sont en SI lisible : m², kWh/an, litres, euros, années.
  */
 
@@ -24,8 +29,10 @@ export const PART_TOITURE_UTILE = 0.7;
 export const M2_PAR_KWC = 6.5;
 /** Part de la production auto-consommée sans batterie (le reste est revendu). */
 export const TAUX_AUTOCONSOMMATION = 0.45;
-/** Volume d'eau potable remplaçable par l'eau de pluie, plafond par foyer (m³/an). */
-export const EAU_REMPLACABLE_M3 = 45;
+/** Eau potable remplaçable par foyer (WC, linge, nettoyage, jardin) : m³/an. */
+export const EAU_FOYER_M3 = 45;
+/** Pour un bâtiment collectif, on compte environ un foyer par… */
+export const M2_TOITURE_PAR_FOYER = 120;
 
 export interface ZoneClimat {
   id: string;
@@ -126,16 +133,40 @@ export interface Calcul {
   roiAnnees: number | null;
 }
 
-/** Coût de pose d'une installation PV, calibré sur les tarifs moyens 2024-2025. */
+/** Coût de pose d'une installation PV, DÉGRESSIF, calibré sur les tarifs
+ * moyens 2024-2025 : 1 733 €/kWc jusqu'à 9 kWc (maison), 1 250 €/kWc pour
+ * les grandes toitures (copropriété, commerce, hangar), 900 €/kWc au-delà
+ * (bâtiments industriels) — la fabrication et la pose d'un châssis unique sur
+ * grande toiture coûtent moins au kWc qu'une suite de petits chantiers.
+ */
 export function coutSolaire(puissanceKwc: number): number {
-  const base = 2600 + 1733 * puissanceKwc;
-  // L'installation ne descend jamais sous ~3 degis : les premiers kWh coûtent cher.
-  return Math.round(base);
+  if (puissanceKwc <= 9) {
+    return Math.round(2600 + 1733 * puissanceKwc);
+  }
+  if (puissanceKwc <= 100) {
+    // Grande toiture (copropriété, commerce, hangar) : fabrication et pose
+    // mutualisées, le kWc coûte moins cher.
+    return Math.round(2600 + 1733 * 9 + 1250 * (puissanceKwc - 9));
+  }
+  // Bâtiments industriels : châssis uniques, grues et équipes dédiées.
+  return Math.round(2600 + 1733 * 9 + 1250 * 91 + 900 * (puissanceKwc - 100));
 }
 
-/** Coût d'une cuve d'eau de pluie enterrée 5 m³ + raccordements (pose incluse). */
-export function coutEau(): number {
-  return 4500;
+/** Coût moyen ramené au kWc, pour la lecture des économies d'échelle. */
+export function coutMoyenParKwc(puissanceKwc: number): number {
+  if (puissanceKwc <= 0) return 0;
+  return Math.round(coutSolaire(puissanceKwc) / puissanceKwc);
+}
+
+/**
+ * Coût d'un équipement de récupération d'eau de pluie ENTERRÉ + raccordements
+ * (WC / lave-linge / réserve technique) : la cuve se dimensionne sur ~2 mois
+ * d'eau remplacée ; au-delà de la cuve de maison (5 m³), chaque m³ de plus
+ * coûte ~900 € posé — les grands volumes sont négociés.
+ */
+export function coutEau(volumeRemplacableM3: number): number {
+  const capacite = Math.min(120, Math.max(5, Math.round(volumeRemplacableM3 / 6)));
+  return Math.round(4500 + 900 * Math.max(0, capacite - 5));
 }
 
 /** Calcule tout le profil du foyer à partir des entrées brutes du panneau. */
@@ -149,9 +180,15 @@ export function calculer(entrees: Entrees): Calcul {
   const volumeEauLitres = Math.round(
     entrees.surfaceToiture * zone.pluieMmAn * 0.9, // 90 % de l'eau de pluie est collectée.
   );
+  // Plafond d'eau remplaçable : un foyer (45 m³/an), ou un foyer par ~120 m²
+  // de toiture dans un immeuble en copropriété / tertiaire.
+  const plafondEauM3 = Math.max(
+    EAU_FOYER_M3,
+    Math.round((entrees.surfaceToiture / M2_TOITURE_PAR_FOYER) * EAU_FOYER_M3),
+  );
   const eauRemplaceeM3 = Math.min(
     (volumeEauLitres * 0.75) / 1000, // 75 % du volume est comparable (WC, linge, jardin).
-    EAU_REMPLACABLE_M3,
+    plafondEauM3,
   );
 
   const factureAnnuelleEur = entrees.factureMensuelle * 12;
@@ -165,7 +202,7 @@ export function calculer(entrees: Entrees): Calcul {
   const economieAnnuelleEur = economieSolaireEur + economieEauEur;
 
   const coutSolaireEur = coutSolaire(puissanceKwc);
-  const coutEauEur = coutEau();
+  const coutEauEur = coutEau(eauRemplaceeM3);
   const investissementEur = coutSolaireEur + coutEauEur;
 
   const roiAnnees =
