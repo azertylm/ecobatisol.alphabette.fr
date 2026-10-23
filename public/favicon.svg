@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- ÉcoBâtisseur Sol : soleil + toiture, dérivés de l'accent #166534 -->
+  <!-- ÉcoBâtisol : soleil + toiture, dérivés de l'accent #166534 -->
   <rect width="64" height="64" rx="14" fill="#166534"/>
   <g stroke="#fde047" stroke-width="3.5" stroke-linecap="round">
     <line x1="32" y1="7" x2="32" y2="12"/>

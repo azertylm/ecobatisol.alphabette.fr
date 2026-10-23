@@ -1,11 +1,11 @@
-# ÉcoBâtisseur Sol
+# ÉcoBâtisol
 
 **Autonomie solaire et eau de pluie, chiffrée chez vous**
 
 Application de l'écosystème [alphabette.fr](https://alphabette.fr).
 
-- Adresses : **https://ecobatisseur.alphabette.fr** (sous-domaine) et
-  **https://alphabette.fr/ecobatisseur** (chemin).
+- Adresses : **https://ecobatisol.alphabette.fr** (sous-domaine) et
+  **https://alphabette.fr/ecobatisol** (chemin).
 - Base commune : [`@alphabette/shell`](https://alphabette.fr) — les deux barres du
   haut (écosystème + application), le thème jour/nuit, la densité et le plein écran.
 
@@ -24,12 +24,12 @@ src/
   App.tsx                       application enveloppée par <AppShell>
   alphabette.app.ts             identité du site (nom, sous-titre, couleur, liens)
   shell/                        base commune @alphabette/shell (générée, à ne pas recoder)
-  ecobatisseur/
-    EcoBatisseur.tsx            le simulateur : configuration, résultats, plan d'action
+  ecobatisol/
+    EcoBatisol.tsx              le simulateur : configuration, résultats, plan d'action
     calcul.ts                   moteur de calcul (zones climatiques, formules commentées)
     recommandations.ts          matrice des trois paliers budgétaires (fiches + gains)
     ui.tsx                      petites briques : compteur animé, info-bulles, sliders
-    ecobatisseur.css            style (palette dérivée de --ab-*, mobile-first, AAA)
+    ecobatisol.css              style (palette dérivée de --ab-*, mobile-first, AAA)
 ```
 
 ## Le simulateur

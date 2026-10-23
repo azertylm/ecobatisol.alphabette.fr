@@ -1,7 +1,7 @@
 /**
- * ecobatisseur/EcoBatisseur.tsx
+ * ecobatisol/EcoBatisol.tsx
  *
- * Le corps de « ÉcoBâtisseur Sol » : trois blocs empilés sur mobile, deux
+ * Le corps de « ÉcoBâtisol » : trois blocs empilés sur mobile, deux
  * colonnes sur écran large.
  *
  *   1. Panneau de configuration : sliders de précision + sélecteur visuel
@@ -39,7 +39,7 @@ function vibrer(duree = 10) {
 
 const fmtAnnuelle = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
 
-export function EcoBatisseur() {
+export function EcoBatisol() {
   const [surfaceToiture, setSurfaceToiture] = useState(80);
   const [factureMensuelle, setFactureMensuelle] = useState(120);
   const [zoneId, setZoneId] = useState('ouest');

@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "ecobatisseur",
+      "name": "ecobatisol",
       "dependencies": {
         "react": "^19.0.1",
         "react-dom": "^19.0.1",

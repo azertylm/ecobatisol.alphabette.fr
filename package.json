@@ -1,9 +1,9 @@
 {
-  "name": "ecobatisseur",
+  "name": "ecobatisol",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "ÉcoBâtisseur Sol — application de l'écosystème alphabette.fr",
+  "description": "ÉcoBâtisol — application de l'écosystème alphabette.fr",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

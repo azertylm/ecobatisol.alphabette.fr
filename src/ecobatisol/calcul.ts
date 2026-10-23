@@ -1,7 +1,7 @@
 /**
- * ecobatisseur/calcul.ts
+ * ecobatisol/calcul.ts
  *
- * Moteur de calcul du simulateur « ÉcoBâtisseur Sol ».
+ * Moteur de calcul du simulateur « ÉcoBâtisol ».
  *
  * Philosophie : des formules simples, tracées et honnêtes. Chaque hypothèse est
  * nommée, commentée et volontairement dans la moyenne française haute (données

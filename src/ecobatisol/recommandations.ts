@@ -1,5 +1,5 @@
 /**
- * ecobatisseur/recommandations.ts
+ * ecobatisol/recommandations.ts
  *
  * Matrice de recommandations budgétaires : trois paliers, des fiches
  * d'actions concrètes, des gains estimés à partir du contexte du foyer

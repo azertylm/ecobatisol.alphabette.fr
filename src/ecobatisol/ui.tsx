@@ -1,5 +1,5 @@
 /**
- * ecobatisseur/ui.tsx
+ * ecobatisol/ui.tsx
  *
  * Petits composants réutilisables du simulateur :
  *  - Compteur      : nombre animé (compte des milliers vers la valeur cible) ;
