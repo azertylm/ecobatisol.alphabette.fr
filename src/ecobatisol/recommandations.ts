@@ -117,11 +117,11 @@ export const MATRICE: PalierBudget[] = [
       },
       {
         icone: '🧣',
-        titre: 'Isoler le chauffe-eau + minuteur',
-        cout: '≈ 70 €',
+        titre: 'Isoler le chauffe-eau et ses tuyaux',
+        cout: '≈ 50 €',
         texte:
-          'Une couverture isolante autour de la cuve et un minuteur qui la coupe la nuit évitent de réchauffer l’eau pour rien.',
-        gain: () => '≈ 80 €/an',
+          'Si le ballon est dans un local froid (garage, cellier), une housse isolante et des manchons sur les tuyaux d’eau chaude limitent les pertes. Laissez-le chauffer en heures creuses, la nuit : c’est là que le kWh est le moins cher.',
+        gain: () => '≈ 20 à 40 €/an',
       },
       {
         icone: '🌡️',
