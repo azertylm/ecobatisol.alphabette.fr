@@ -46,8 +46,8 @@ export const MATRICE: PalierBudget[] = [
         titre: 'Débrancher les veilles',
         cout: '0 €',
         texte:
-          'TV, box internet, consoles, chargeurs : la veille peut peser jusqu’à 10 % de la facture. Une simple multiprise avec interrupteur (ou des gestes du soir) suffit.',
-        gain: (ctx) => gainEur(ctx.factureAnnuelleEur * 0.1),
+          'TV, box internet, consoles, chargeurs : la veille peut peser jusqu’à 10 % de la facture hors chauffage. Une simple multiprise avec interrupteur (ou des gestes du soir) suffit.',
+        gain: (ctx) => gainEur(ctx.factureAnnuelleEur * 0.05),
       },
       {
         icone: '🧺',
@@ -62,8 +62,8 @@ export const MATRICE: PalierBudget[] = [
         titre: 'Décaler les gros usages en heures creuses',
         cout: '0 €',
         texte:
-          'Lave-linge, lave-vaisselle et chauffe-eau programmés la nuit (ou entre 13 h et 15 h, quand le solaire national tourne à plein) : même confort, tarif réduit si votre abonnement propose heures creuses.',
-        gain: (ctx) => gainEur(ctx.factureAnnuelleEur * 0.15),
+          'Lave-linge, lave-vaisselle et chauffe-eau programmés pendant vos heures creuses (la nuit, et parfois l’après-midi : elles sont indiquées sur votre facture) : même confort, kWh moins cher. Gain seulement si vous êtes en option heures pleines / heures creuses.',
+        gain: (ctx) => gainEur(ctx.factureAnnuelleEur * 0.05),
       },
       {
         icone: '🚿',
@@ -96,7 +96,7 @@ export const MATRICE: PalierBudget[] = [
         cout: '≈ 60 €',
         texte:
           'Une ampoule LED consomme 5 fois moins qu’une halogène et dure 15 ans. Complétée par des multiprises coupe-veille, la maison ne « fuit » plus.',
-        gain: (ctx) => gainEur(ctx.factureAnnuelleEur * 0.12),
+        gain: (ctx) => gainEur(ctx.factureAnnuelleEur * 0.05),
       },
       {
         icone: '💦',
@@ -125,11 +125,11 @@ export const MATRICE: PalierBudget[] = [
       },
       {
         icone: '🌡️',
-        titre: 'Chauffe-eau à 50 °C préréglé + sherlock des poignées',
-        cout: '≈ 25 €',
+        titre: 'Chauffe-eau réglé entre 55 et 60 °C',
+        cout: '0 €',
         texte:
-          'Abaisser le thermostat de 15 °C supprime la sur-consommation de confort, et un thermomètre de bain remplace la pression du robinet chaud. Sécurité et économie, une pierre deux coups.',
-        gain: () => '≈ 70 €/an',
+          'Beaucoup de chauffe-eau chauffent à 65-70 °C : c’est de l’énergie perdue. Réglez le thermostat entre 55 et 60 °C, pas moins : en dessous, des bactéries (légionelles) peuvent se développer dans la cuve.',
+        gain: () => '≈ 30 à 50 €/an',
       },
     ],
   },
@@ -181,7 +181,7 @@ export const MATRICE: PalierBudget[] = [
         cout: '≈ 3 500 € posé',
         texte:
           'Une pompe à chaleur dédiée à l’eau chaude : 3 à 4 fois moins d’électricité qu’un chauffe-eau classique. Aide MaPrimeRénov’ possible en rénovation.',
-        gain: (ctx) => gainEur(ctx.factureAnnuelleEur * 0.35),
+        gain: (ctx) => gainEur(ctx.factureAnnuelleEur * 0.12),
       },
       {
         icone: '🔋',

@@ -17,8 +17,9 @@
  * Toutes les grandeurs sont en SI lisible : m², kWh/an, litres, euros, années.
  */
 
-/** Prix moyen du kWh électrique en France (tarif réglementé, 2025). */
-export const PRIX_KWH = 0.2516;
+/** Prix du kWh au tarif réglementé EDF, option Base 6 kVA, TTC, depuis le
+ * 1er août 2026 (délibération CRE n° 2026-147). Prochaine révision : février 2027. */
+export const PRIX_KWH = 0.2001;
 /** Tarif de revente du surplus non consommé (ordre de grandeur 2025). */
 export const PRIX_REVENTE_SURPLUS = 0.04;
 /** Prix moyen de l'eau potable + assainissement en France (€ par m³). */

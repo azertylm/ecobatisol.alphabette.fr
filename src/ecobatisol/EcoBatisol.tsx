@@ -461,7 +461,7 @@ export function EcoBatisol() {
             <ul>
               <li>
                 Solaire : 70 % de la toiture exploitable, 6,5 m² par kWc, rendement selon la zone
-                (900 à 1 400 kWh/kWc/an), 45 % autoconsommé à prix plein (25 c€/kWh), surplus revendu
+                (900 à 1 400 kWh/kWc/an), 45 % autoconsommé au prix du tarif réglementé (20 c€/kWh, août 2026), surplus revendu
                 ≈ 4 c€/kWh. Tarif résidentiel appliqué ; en tertiaire le prix réel diffère un peu.
               </li>
               <li>
