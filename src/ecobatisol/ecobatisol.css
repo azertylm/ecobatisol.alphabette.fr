@@ -30,6 +30,7 @@
   --eb-ombre-soft: 0 12px 32px -24px color-mix(in oklab, var(--ab-ink) 45%, transparent);
 
   position: relative;
+  box-sizing: border-box; /* largeur 100 % marges intérieures comprises : plus de débordement sur téléphone */
   width: 100%;
   max-width: 1160px;
   margin: 0 auto;
